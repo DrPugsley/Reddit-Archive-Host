@@ -1,0 +1,25 @@
+<!DOCTYPE html>
+<html>
+<head>
+
+	<link rel="stylesheet" type="text/css" href="/static/style.css">
+	<title>{{title}}</title>
+
+</head>
+
+<body>
+	<div class="ptitle">
+		<h2>{{post_title}}<h2>
+	</div>
+
+	<div class="mainpost">
+		{{post_body|safe}}
+	</div>
+</body>
+<br><br><br>
+
+<div id="comments">
+	{{comments|safe}}
+</div>
+
+</html>
