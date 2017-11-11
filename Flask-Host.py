@@ -67,7 +67,6 @@ def thread(sub, id):
 						images.append('<img src="/static/images/{}/{}" height="45%" width="45%">'.format(sub, a))
 					elif a.endswith(tuple(['.mp4', '.webm'])):
 						images.append('<video width="40%" height="40%" autoplay loop controls><source src="/static/images/{}/{}" type="video/mp4"></video>'.format(sub, a))
-		print(images)
 
 	comments = loaded_json[1]['data']['children']
 	comments_list = []
