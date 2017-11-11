@@ -17,3 +17,7 @@ This will start an instance of flask so that you can browse your downloaded subr
 
 ## Other
 [What browsing looks like](https://giant.gfycat.com/AmazingWellmadeAiredale.webm)
+
+Required modules are: requests, natsort and flask.
+
+You can install them with `pip3 install -U -r requirements.txt`
