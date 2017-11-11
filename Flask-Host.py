@@ -1,8 +1,10 @@
-from flask import Flask, render_template
+from flask import Flask, render_template, url_for
 from datetime import datetime
+from natsort import natsorted
 import json, html, os
 
 app = Flask(__name__)
+cwd = os.getcwd()
 
 @app.route('/')
 def index():
@@ -28,13 +30,12 @@ def sub_date(sub, date):
 	posts = []
 
 	for a in loaded_json['data']['children']:
-		if a['data']['is_self']:
-			title = a['data']['title']
-			author = a['data']['author']
-			score = a['data']['score']
-			date = datetime.fromtimestamp(a['data']['created_utc'])
-			link = '/r/{}/post/{}'.format(sub, a['data']['id'])
-			posts.append('''<div class="postinfo">[author: {}] [score: {}] [date: {}]<br>
+		title = a['data']['title']
+		author = a['data']['author']
+		score = a['data']['score']
+		date = datetime.fromtimestamp(a['data']['created_utc'])
+		link = '/r/{}/post/{}'.format(sub, a['data']['id'])
+		posts.append('''<div class="postinfo">[author: {}] [score: {}] [date: {}]<br>
 <a href="{}">{}</a></div><br><br>\n'''.format(author, score, date, link, title))
 	return render_template('sub_date.html', sub=sub, date=date, posts=''.join(posts))
 
@@ -45,8 +46,28 @@ def thread(sub, id):
 
 	title = loaded_json[0]['data']['children'][0]['data']['title']
 	post_body = loaded_json[0]['data']['children'][0]['data']['selftext_html']
+	is_self = loaded_json[0]['data']['children'][0]['data']['is_self']
 	if post_body is None:
 		post_body = title
+
+	if not is_self:
+		post_body = ''
+		# image = '<img src="'+url_for('/r/{}/posts/images/{}.jpg'.format(sub, id))+'>'
+		images = []
+		for a in os.listdir('static/images/{}/'.format(sub)):
+			if id in a:
+				if os.path.isdir('static/images/{}/{}'.format(sub, a)):
+					for b in natsorted(os.listdir('static/images/{}/{}'.format(sub, a))):
+						if b.endswith(tuple(['.jpg', '.png', '.gif', '.jpeg'])):
+							images.append('<img src="/static/images/{}/{}/{}" height="45%" width="45%"><br>'.format(sub, a, b))
+						elif b.endswith(tuple(['.mp4', '.webm'])):
+							images.append('<video width="40%" height="40%" autoplay loop controls><source src="/static/images/{}/{}/{}" type="video/mp4"></video>'.format(sub, a, b))
+				else:
+					if a.endswith(tuple(['.jpg', '.png', '.gif', '.jpeg'])):
+						images.append('<img src="/static/images/{}/{}" height="45%" width="45%">'.format(sub, a))
+					elif a.endswith(tuple(['.mp4', '.webm'])):
+						images.append('<video width="40%" height="40%" autoplay loop controls><source src="/static/images/{}/{}" type="video/mp4"></video>'.format(sub, a))
+		print(images)
 
 	comments = loaded_json[1]['data']['children']
 	comments_list = []
@@ -61,9 +82,10 @@ def thread(sub, id):
 			print('KeyError')
 			pass
 
-
-	return render_template('post_template.html', title=title, post_title=title, post_body=html.unescape(post_body), comments='\n'.join(comments_list))
-
+	if not is_self:
+		return render_template('post_template.html', title=title, post_title=title, post_body=html.unescape(post_body), image='\n'.join(images), comments='\n'.join(comments_list))
+	else:
+		return render_template('post_template.html', title=title, post_title=title, post_body=html.unescape(post_body), comments='\n'.join(comments_list))
 
 if __name__ == "__main__":
 	app.run()
