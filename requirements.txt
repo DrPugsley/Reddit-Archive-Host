@@ -1,0 +1,3 @@
+Flask==0.12.2
+natsort==5.1.0
+requests==2.18.4
