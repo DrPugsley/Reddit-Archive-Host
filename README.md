@@ -5,9 +5,13 @@ Set of tools for downloading and locally hosting text-based reddit content.
 ## Usage
 #### Downloading posts:
 
-`python3 Post-Archiver.py [Subreddit]`
+`python3 Post-Archiver.py [Subreddit] [Time] [Number of posts]`
 
-This will download the top 50 posts of the current day from the selected subreddit in json format.
+`Subreddit` will just be the name of the subreddit you want to archive.
+
+`Time` will be the time range you want to archive. It will be day, week, month, year, or all
+
+`Number of posts`is pretty self explanatory; It's how many posts you want to archive. The maximum (due to reddit's json api limitations) is 100
 
 #### Hosting downloaded posts:
 

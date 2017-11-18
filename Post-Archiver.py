@@ -2,13 +2,26 @@ from datetime import datetime
 import requests, json, sys, os, threading, time, re
 
 sub = sys.argv[1]
+t = sys.argv[2]
+limit = sys.argv[3]
 date = datetime.now().strftime('%Y-%m-%d')
-url = 'https://www.reddit.com/r/{}/top.json?sort=top&t=day&limit=20'.format(sub)
+url = 'https://www.reddit.com/r/{}/top.json?sort=top&t={}&limit={}'.format(sub, t, limit)
 headers = {'User-Agent': 'Post Archiver'}
 threads = []
 extensions = ['.jpg', '.png', '.jpeg', '.gif', '.mp4', '.webm', '.gifv']
 links = []
 finished_links = []
+
+if t.lower() == 'day':
+	datetime.now().strftime('%Y-%m-%d')
+elif t.lower() == 'week':
+	date = 'Week_of_' + datetime.now().strftime('%Y-%m-%d')
+elif t.lower() == 'month':
+	date = datetime.now().strftime('%Y-%m')
+elif t.lower() == 'year':
+	date = datetime.now().strftime('%Y')
+elif t.lower() == 'all':
+	date = 'All_Time'
 
 os.makedirs('r/{}/posts'.format(sub), exist_ok=True)
 
