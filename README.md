@@ -11,7 +11,7 @@ Set of tools for downloading and locally hosting text-based reddit content.
 
 `Time` will be the time range you want to archive. It will be day, week, month, year, or all
 
-`Number of posts`is pretty self explanatory; It's how many posts you want to archive. The maximum (due to reddit's json api limitations) is 100
+`Number of posts`is pretty self explanatory; It's how many posts you want to archive. The maximum (due to reddit's json api limitations) is 1000
 
 #### Hosting downloaded posts:
 
