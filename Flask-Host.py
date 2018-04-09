@@ -16,16 +16,26 @@ def index():
 
 @app.route('/r/<sub>')
 def subreddit(sub):
-	for a in os.listdir('r/{}'.format(sub)):
-		if os.path.isfile('r/{}/{}'.format(sub, a)):
-			dates = []
-			date = os.path.splitext('r/{}/{}'.format(sub, a))[0].split('/')[-1]
-			dates.append('<div class="postinfo"><a href="{}">{}</a></div>\n'.format('/r/{}/date/{}'.format(sub, date), date))
-			return render_template('sub_dates_list.html', sub=sub, dates=''.join(dates))
+	dates = []
+	for a in natsorted(os.listdir('r/{}'.format(sub))):
+		pages = 0
+		if os.path.isfile('r/{}/{}'.format(sub, a)) and 'r/{}/{}'.format(sub, a).endswith('_1.json'):
+			for b in natsorted(os.listdir('r/{}'.format(sub))):
+				if b.startswith(a.replace('_1.json','')):
+					pages += 1
+			date = os.path.splitext('r/{}/{}'.format(sub, a))[0].split('/')[-1].replace('_1','')
+			dates.append('<div class="postinfo"><a href="{}/1">{}</a>({} pages)</div>\n<br>\n'.format('/r/{}/date/{}'.format(sub, date), date, str(pages)))
+	return render_template('sub_dates_list.html', sub=sub, dates=''.join(dates))
 
-@app.route('/r/<sub>/date/<date>')
-def sub_date(sub, date):
-	json_file = open('r/{}/{}.json'.format(sub, date), 'r').read()
+@app.route('/r/<sub>/date/<date>/<page>')
+def sub_date(sub, date, page):
+	pages = 0
+	for a in natsorted(os.listdir('r/{}/'.format(sub))):
+		if a.endswith('.json') and a.startswith(date):
+			pages += 1
+	remaining_pages = pages - int(page)
+	print(remaining_pages)
+	json_file = open('r/{}/{}_{}.json'.format(sub, date, page), 'r').read()
 	loaded_json = json.loads(json_file)
 	posts = []
 
@@ -37,6 +47,10 @@ def sub_date(sub, date):
 		link = '/r/{}/post/{}'.format(sub, a['data']['id'])
 		posts.append('''<div class="postinfo">[author: {}] [score: {}] [date: {}]<br>
 <a href="{}">{}</a></div><br><br>\n'''.format(author, score, date, link, title))
+	if remaining_pages > 0:
+		posts.append('''<div class="next-button"><a href="{}">Next</a></div><br><br>'''.format(str(int(page)+1)))
+	else:
+		posts.append('''<div class="next-button">No more pages</div><br><br>'''.format(str(int(page)+1)))
 	return render_template('sub_date.html', sub=sub, date=date, posts=''.join(posts))
 
 @app.route('/r/<sub>/post/<id>')
