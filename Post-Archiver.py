@@ -37,7 +37,7 @@ else:
 	url = 'https://www.reddit.com/r/{}/top.json?sort=top&t={}&limit={}'.format(sub, t, str(limit))
 	list_json = requests.get(url, headers=headers).text
 	loaded_list_json = json.loads(list_json)
-	with open('r/{}/{}.json'.format(sub, date), 'w') as f:
+	with open('r/{}/{}_1.json'.format(sub, date), 'w') as f:
 		f.write(list_json)
 
 if t.lower() == 'day':
@@ -84,6 +84,9 @@ try:
 	sys.stdout.write('\n')
 except NameError:
 	for a in loaded_list_json['data']['children']:
+		current_post += 1
+		sys.stdout.write('\rFetching posts: [{}/{}]'.format(str(current_post), str(limit)))
+		sys.stdout.flush()
 		json_url = 'https://reddit.com'+a['data']['permalink']+'.json'
 		thread_id = a['data']['id']
 
@@ -95,7 +98,7 @@ except NameError:
 		if 'gfycat' in link[0] or 'imgur' in link[0] or 'i.redd.it' in link[0] or link[0].endswith(tuple(extensions)):
 			os.makedirs('static/images/{}'.format(sub), exist_ok=True)
 			links.append(link)
-		time.sleep(0.2)
+		time.sleep(0.02)
 current_image_link = 0
 for c in links:
 	current_image_link += 1
